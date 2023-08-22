@@ -32,6 +32,8 @@ The component `PostForm` currently has markup but lacks functionality. Your miss
 
 Please adhere to the app's conventions for making HTTP requests.
 
+You are encouraged to use [Pinia](https://pinia.vuejs.org/) as store for posts.
+
 ✋ **BEFORE YOU BEGIN**
 
 > Please update the following line in this `README.md` file to include your estimate of the time required for completion.
@@ -53,6 +55,8 @@ When a logged-in user clicks the "Follow" button next to the name of a post auth
 The button label should then change to "Unfollow". If the user clicks it, the post author should be removed from their list of favorite users. In other words, this action corresponds to a `DELETE` request to `users/{user}/favorite`.
 
 Whenever the user reloads the page or logs out and logs back in again, the buttons should display either "Follow" or "Unfollow" and perform the respective actions accordingly. To achieve this functionality, you should depend on the favorites payload provided by the API.
+
+You are encouraged to use [Pinia](https://pinia.vuejs.org/) as store for favorites.
 
 ✋ **BEFORE YOU BEGIN**
 
@@ -118,7 +122,7 @@ This is an _optional task_. We would appreciate it if you could take the opportu
 
 The goal is to enable users to attach an image when creating a post. You can achieve this by adding an `<input type="file" accept="image/*" />` element within the form. If necessary, please feel free to make updates to the `$api` plugin.
 
-For posts that include an image, the image should be displayed below the body of the post and above the "Add to favorites" button.
+Posts that include an image should be display it below the body of the post and above the "Add to favorites" button.
 
 ✋ **BEFORE YOU BEGIN**
 
