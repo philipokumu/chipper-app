@@ -1,12 +1,23 @@
 <script setup>
 import { HeartIcon } from '@heroicons/vue/24/outline'
+import { storeToRefs } from 'pinia'
 
-defineProps({
+const props = defineProps({
   post: {
     type: Object,
     required: true
   }
 })
+
+const favoriteStore = useFavoriteStore()
+const { isUserFavorited, postBelongsToCurrentUser } = storeToRefs(favoriteStore)
+const isCurrentUserPost = computed(() => postBelongsToCurrentUser.value(props.post.user.id))
+const isFollowing = computed(() => isUserFavorited.value(props.post.user.id))
+
+async function handleFollowToggle() {
+  await favoriteStore.toggleUserFavorite(props.post.user)
+}
+
 </script>
 
 <template>
@@ -18,8 +29,8 @@ defineProps({
       <div>
         by <strong>{{ post.user.name }}</strong>
       </div>
-      <button class="font-medium bg-blue-200 text-sm px-2 rounded-full">
-        Follow
+      <button v-show="!isCurrentUserPost" class="font-medium bg-blue-200 text-sm px-2 rounded-full" @click="handleFollowToggle">
+        {{ isFollowing  ? 'Unfollow' : 'Follow' }}
       </button>
     </div>
     <p>
