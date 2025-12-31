@@ -9,6 +9,7 @@ const props = defineProps({
   }
 })
 
+const user = useUser()
 const favoriteStore = useFavoriteStore()
 const { isUserFavorited, postBelongsToCurrentUser, isPostFavorited } = storeToRefs(favoriteStore)
 const isCurrentUserPost = computed(() => postBelongsToCurrentUser.value(props.post.user.id))
@@ -16,13 +17,22 @@ const isFollowing = computed(() => isUserFavorited.value(props.post.user.id))
 const postIsFavorited = computed(() => isPostFavorited.value(props.post.id))
 
 async function handleFollowToggle() {
+  if (!checkAuth()) return
   await favoriteStore.toggleUserFavorite(props.post.user)
 }
 
 async function handleFavoritePostToggle() {
+  if (!checkAuth()) return
   await favoriteStore.togglePostFavorite(props.post)
 }
 
+function checkAuth() {
+  if (user.isGuest) {
+    navigateTo('/login')
+    return false
+  }
+  return true
+}
 </script>
 
 <template>
@@ -34,7 +44,10 @@ async function handleFavoritePostToggle() {
       <div>
         by <strong>{{ post.user.name }}</strong>
       </div>
-      <button v-show="!isCurrentUserPost" class="font-medium bg-blue-200 text-sm px-2 rounded-full" @click="handleFollowToggle">
+      <button
+        :disabled="isCurrentUserPost"
+        class="font-medium bg-blue-200 text-sm px-2 rounded-full"
+        @click="handleFollowToggle">
         {{ isFollowing  ? 'Unfollow' : 'Follow' }}
       </button>
     </div>
@@ -42,7 +55,7 @@ async function handleFavoritePostToggle() {
       {{ post.body }}
     </p>
     <button
-      v-show="!isCurrentUserPost"
+      :disabled="isCurrentUserPost"
       class="bg-red-200 text-red-500 flex items-center justify-center gap-2 p-4 rounded-lg"
       :class="[
         postIsFavorited 

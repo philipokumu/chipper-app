@@ -25,6 +25,11 @@ export const useFavoriteStore = defineStore('favorites', () => {
 
     // Action: Fetch all favorites
     async function fetchFavorites() {
+        if (!userStore.data?.id) {
+            console.log('User is guest, skipping favorites fetch.')
+            return 
+        }
+
         try {
             const response = await $api.get('/favorites')
             favorites.value = {
@@ -32,7 +37,7 @@ export const useFavoriteStore = defineStore('favorites', () => {
                 posts: response.data.posts || []
             }
         } catch (error) {
-        console.error('Error fetching favorites:', error)
+            console.error('Error fetching favorites:', error)
         }
     }
 
