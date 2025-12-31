@@ -10,12 +10,17 @@ const props = defineProps({
 })
 
 const favoriteStore = useFavoriteStore()
-const { isUserFavorited, postBelongsToCurrentUser } = storeToRefs(favoriteStore)
+const { isUserFavorited, postBelongsToCurrentUser, isPostFavorited } = storeToRefs(favoriteStore)
 const isCurrentUserPost = computed(() => postBelongsToCurrentUser.value(props.post.user.id))
 const isFollowing = computed(() => isUserFavorited.value(props.post.user.id))
+const postIsFavorited = computed(() => isPostFavorited.value(props.post.id))
 
 async function handleFollowToggle() {
   await favoriteStore.toggleUserFavorite(props.post.user)
+}
+
+async function handleFavoritePostToggle() {
+  await favoriteStore.togglePostFavorite(props.post)
 }
 
 </script>
@@ -36,11 +41,20 @@ async function handleFollowToggle() {
     <p>
       {{ post.body }}
     </p>
-    <button class="bg-red-200 text-red-500 flex items-center justify-center gap-2 p-4 rounded-lg">
+    <button
+      v-show="!isCurrentUserPost"
+      class="bg-red-200 text-red-500 flex items-center justify-center gap-2 p-4 rounded-lg"
+      :class="[
+        postIsFavorited 
+          ? 'bg-red-200 text-red-600' 
+          : 'bg-green-200 text-green-700'
+      ]"
+      @click="handleFavoritePostToggle"
+    >
       <HeartIcon
         class="h-6 stroke-current" />
       <span class="font-bold">
-        Add to my favorites
+        {{ postIsFavorited ? 'Remove from favorites' : 'Add to my favorites' }}
       </span>
     </button>
   </div>

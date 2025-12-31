@@ -18,6 +18,11 @@ export const useFavoriteStore = defineStore('favorites', () => {
         return userId === userStore.data.id
     })
 
+    // Getter: Check if a post is favorited
+    const isPostFavorited = computed(() => (postId) => {
+        return favorites.value.posts.some(post => post.id === postId)
+    })
+
     // Action: Fetch all favorites
     async function fetchFavorites() {
         try {
@@ -61,11 +66,43 @@ export const useFavoriteStore = defineStore('favorites', () => {
         }
     }
 
+    // Sction: Toggle favorite/unfavorite post
+    async function togglePostFavorite(post) {
+        const postId = post.id
+        const index = favorites.value.posts.findIndex(p => p.id === postId)
+        const isFavorited = index !== -1
+
+        // Optimistic Update
+        if (isFavorited) {
+            favorites.value.posts.splice(index, 1)
+        } else {
+            favorites.value.posts.push(post)
+        }
+
+        try {
+            if (isFavorited) {
+                await $api.delete(`/posts/${postId}/favorite`)
+            } else {
+                await $api.post(`/posts/${postId}/favorite`)
+            }
+        } catch (error) {
+            console.error('Failed to toggle post favorite:', error)
+            if (isFavorited) {
+                favorites.value.posts.push(post)
+            } else {
+                const i = favorites.value.posts.findIndex(p => p.id === postId)
+                favorites.value.posts.splice(i, 1)
+            }
+        }
+    }
+
     return {
         favorites,
-        fetchFavorites,
         isUserFavorited,
-        toggleUserFavorite,
         postBelongsToCurrentUser,
+        isPostFavorited,
+        fetchFavorites,
+        toggleUserFavorite,
+        togglePostFavorite
     }
 })
