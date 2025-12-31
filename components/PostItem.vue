@@ -11,7 +11,7 @@ const props = defineProps({
 
 const user = useUser()
 const favoriteStore = useFavoriteStore()
-const { isUserFavorited, postBelongsToCurrentUser, isPostFavorited } = storeToRefs(favoriteStore)
+const { isUserFavorited, postBelongsToCurrentUser, isPostFavorited, loading } = storeToRefs(favoriteStore)
 const isCurrentUserPost = computed(() => postBelongsToCurrentUser.value(props.post.user.id))
 const isFollowing = computed(() => isUserFavorited.value(props.post.user.id))
 const postIsFavorited = computed(() => isPostFavorited.value(props.post.id))
@@ -45,7 +45,7 @@ function checkAuth() {
         by <strong>{{ post.user.name }}</strong>
       </div>
       <button
-        :disabled="isCurrentUserPost"
+        :disabled="isCurrentUserPost || loading"
         class="font-medium bg-blue-200 text-sm px-2 rounded-full"
         @click="handleFollowToggle">
         {{ isFollowing  ? 'Unfollow' : 'Follow' }}
@@ -54,13 +54,19 @@ function checkAuth() {
     <p>
       {{ post.body }}
     </p>
+    <div v-if="post.image_url">
+      <img
+        :src="post.image_url"
+        :alt="`Image for post titled ${post.title}`"
+        class="w-full rounded-lg" />
+    </div>
     <button
-      :disabled="isCurrentUserPost"
-      class="bg-red-200 text-red-500 flex items-center justify-center gap-2 p-4 rounded-lg"
+      :disabled="isCurrentUserPost || loading"
+      class="flex items-center justify-center gap-2 p-4 rounded-lg"
       :class="[
         postIsFavorited 
-          ? 'bg-red-200 text-red-600' 
-          : 'bg-green-200 text-green-700'
+        ? 'bg-red-200 text-red-600' 
+        : 'bg-green-200 text-green-700'
       ]"
       @click="handleFavoritePostToggle"
     >

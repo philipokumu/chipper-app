@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 export const useFavoriteStore = defineStore('favorites', () => {
     const { $api } = useNuxtApp()
     const userStore = useUser()
+    const loading = ref(false)
     const favorites = ref({
         users: [],
         posts: []
@@ -43,6 +44,7 @@ export const useFavoriteStore = defineStore('favorites', () => {
 
     // Action: Toggle favorite/unfavorite user
     async function toggleUserFavorite(user) {
+        loading.value = true
         const userId = user.id
         const index = favorites.value.users.findIndex(u => u.id === userId)
         const isFavorited = index !== -1
@@ -68,11 +70,14 @@ export const useFavoriteStore = defineStore('favorites', () => {
                 const i = favorites.value.users.findIndex(u => u.id === userId)
                 favorites.value.users.splice(i, 1)
             }
+        } finally {
+            loading.value = false
         }
     }
 
     // Sction: Toggle favorite/unfavorite post
     async function togglePostFavorite(post) {
+        loading.value = true
         const postId = post.id
         const index = favorites.value.posts.findIndex(p => p.id === postId)
         const isFavorited = index !== -1
@@ -98,6 +103,8 @@ export const useFavoriteStore = defineStore('favorites', () => {
                 const i = favorites.value.posts.findIndex(p => p.id === postId)
                 favorites.value.posts.splice(i, 1)
             }
+        } finally {
+            loading.value = false   
         }
     }
 
@@ -106,6 +113,7 @@ export const useFavoriteStore = defineStore('favorites', () => {
         isUserFavorited,
         postBelongsToCurrentUser,
         isPostFavorited,
+        loading,
         fetchFavorites,
         toggleUserFavorite,
         togglePostFavorite

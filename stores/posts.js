@@ -16,11 +16,18 @@ export const usePostStore = defineStore('posts', () => {
         }
     }
 
-    async function createPost({ title, body }) {
-        const payload = { title, body }
+    async function createPost({ title, body, image }) {
         loading.value = true
+        const formData = new FormData()
+        formData.append('title', title)
+        formData.append('body', body)
+        
+        if (image) {
+            formData.append('image', image)
+        }
+
         try {
-            const response = await $api.post('/posts', payload)
+          await $api.post('/posts', formData)
         } catch (error) {
             console.error('Failed to create post:', error)
         } finally {
